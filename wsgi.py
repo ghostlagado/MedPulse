@@ -4,4 +4,4 @@ O `app.py` é o runner local (sobe o servidor de desenvolvimento com Socket.IO).
 Aqui apenas expomos a aplicação para um servidor WSGI real.
 """
 
-from app import app  # noqa: F401
+from app import app
