@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo }} · MedPulse</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/logo.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <main class="pagina-erro">
+        <img class="topo__logo" src="{{ url_for('static', filename='img/logo_with_bg.png') }}"
+             alt="MedPulse" width="64" height="64">
+        <h1>{{ titulo }}</h1>
+        <p>{{ mensagem }}</p>
+        {% if voltar %}<a class="botao botao--primario" href="{{ url_for('Rota Principal.inicio') }}">Ir para o painel</a>{% endif %}
+    </main>
+</body>
+
+</html>
