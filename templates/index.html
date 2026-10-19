@@ -1,12 +1,194 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR" data-tema="escuro">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MedPulse</title>
-    <link rel="shortcut icon" href="{{ url_for }}" type="image/x-icon">
+    <meta name="description"
+          content="MedPulse — painel de triagem hospitalar em tempo real para TV de monitoramento.">
+    <meta name="theme-color" content="#04121f">
+    <title>{{ local.nome }} · Painel de triagem</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/logo.png') }}">
+    <link rel="preload" as="style" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
-    
+    <!-- sprite de ícones (inline: sem requisição extra e sem CDN) -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+        <defs>
+            <symbol id="i-pulso" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12h4l2.5-7 4 14L15.5 12H22" /></symbol>
+            <symbol id="i-hospital" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 21V7l8-4 8 4v14" /><path d="M9 21v-5h6v5" /><path d="M12 8v3" /><path d="M10.5 9.5h3" /></symbol>
+            <symbol id="i-relogio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></symbol>
+            <symbol id="i-alerta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.3 3.6 1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0Z" />
+                <path d="M12 9v4" /><path d="M12 17h.01" /></symbol>
+            <symbol id="i-tela" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 9V4h5" /><path d="M20 9V4h-5" /><path d="M4 15v5h5" /><path d="M20 15v5h-5" /></symbol>
+            <symbol id="i-seta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></symbol>
+            <symbol id="i-pessoas" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="8" r="3.2" /><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5" />
+                <path d="M16 4.6a3.2 3.2 0 0 1 0 6.4" /><path d="M18.5 20c0-2.6-1-4.2-3-4.8" /></symbol>
+            <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9" /><path d="m8.5 12.5 2.4 2.4 4.6-5.4" /></symbol>
+            <symbol id="i-sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19" /></symbol>
+            <symbol id="i-lua" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5Z" /></symbol>
+        </defs>
+    </svg>
+
+    <div id="painel">
+        <header class="topo">
+            <div class="topo__marca">
+                <img class="topo__logo" src="{{ url_for('static', filename='img/logo_with_bg.png') }}"
+                     alt="MedPulse" width="52" height="52">
+                <div class="topo__titulo">
+                    <strong>{{ local.nome }}</strong>
+                    <span>Painel de triagem · {{ hospitais_info|length }} unidade{{ '' if hospitais_info|length == 1 else 's' }}</span>
+                </div>
+                {% if showcase_ativo %}<span class="selo-demo" title="Gerador sintético ativo">DEMO</span>{% endif %}
+            </div>
+
+            <div class="topo__acoes">
+                <div id="seletor-hospitais"></div>
+                <div class="relogio" id="relogio" aria-label="Horário do servidor">
+                    <b>--:--:--</b><span>&nbsp;</span>
+                </div>
+                <span class="conexao" id="estado-conexao" data-estado="offline" role="status" aria-live="polite">
+                    <span class="conexao__ponto"></span><span id="estado-conexao-texto">Offline</span>
+                </span>
+                <div id="seletor-tema" class="topo__grupo"></div>
+                <button class="botao botao--icone" id="botao-tela-cheia" type="button" title="Modo parede (tela cheia)"
+                        aria-pressed="false">
+                    <svg class="ico" width="16" height="16">
+                        <use href="#i-tela" /></svg>
+                </button>
+            </div>
+        </header>
+
+        <main class="conteudo">
+            <div id="faixa-status" class="faixa-status" hidden role="alert">
+                <svg class="ico" width="18" height="18">
+                    <use href="#i-alerta" /></svg>
+                <span id="faixa-status-texto">Sem conexão com o servidor. Reconexão automática em andamento.</span>
+            </div>
+
+            <section class="faixa-kpis" id="kpis" aria-label="Indicadores de triagem"></section>
+
+            <section class="grade">
+                <div class="coluna">
+                    <article class="cartao cartao--crescer">
+                        <header class="cartao__cabecalho">
+                            <svg class="ico" width="19" height="19" style="color:var(--acento)">
+                                <use href="#i-pessoas" /></svg>
+                            <div>
+                                <div class="cartao__titulo">Fila por prioridade</div>
+                                <div class="cartao__sub">em aberto agora</div>
+                            </div>
+                        </header>
+                        <div class="cartao__corpo" id="filas-abertas"></div>
+                    </article>
+
+                    <article class="cartao cartao--crescer">
+                        <header class="cartao__cabecalho">
+                            <svg class="ico" width="19" height="19" style="color:var(--acento)">
+                                <use href="#i-hospital" /></svg>
+                            <div>
+                                <div class="cartao__titulo">Por unidade monitorada</div>
+                                <div class="cartao__sub">agregados da seleção atual</div>
+                            </div>
+                        </header>
+                        <div class="cartao__corpo" id="por-hospital"></div>
+                    </article>
+                </div>
+
+                <div class="coluna coluna--centro">
+                    <article class="cartao cartao--crescer">
+                        <header class="cartao__cabecalho">
+                            <svg class="ico" width="19" height="19" style="color:var(--acento)">
+                                <use href="#i-pulso" /></svg>
+                            <div>
+                                <div class="cartao__titulo">Fluxo de atendimento</div>
+                                <div class="cartao__sub">chegadas × conclusões × fila por hora</div>
+                            </div>
+                        </header>
+                        <div class="cartao__corpo cartao__corpo--grafico">
+                            <div class="grafico"><canvas id="grafico-fluxo"></canvas></div>
+                        </div>
+                    </article>
+
+                    <article class="cartao cartao--crescer">
+                        <header class="cartao__cabecalho">
+                            <svg class="ico" width="19" height="19" style="color:var(--acento)">
+                                <use href="#i-relogio" /></svg>
+                            <div>
+                                <div class="cartao__titulo">Tempo de espera</div>
+                                <div class="cartao__sub">distribuição da fila atual</div>
+                            </div>
+                        </header>
+                        <div class="cartao__corpo" id="espera"></div>
+                    </article>
+                </div>
+
+                <div class="coluna">
+                    <article class="cartao cartao--crescer">
+                        <header class="cartao__cabecalho">
+                            <svg class="ico" width="19" height="19" style="color:var(--ok)">
+                                <use href="#i-check" /></svg>
+                            <div>
+                                <div class="cartao__titulo">Atendidos</div>
+                                <div class="cartao__sub" id="sub-atendidos">por prioridade</div>
+                            </div>
+                        </header>
+                        <div class="cartao__corpo" id="atendidos"></div>
+                    </article>
+
+                    <article class="cartao cartao--crescer">
+                        <header class="cartao__cabecalho">
+                            <svg class="ico" width="19" height="19" style="color:var(--p-alta)">
+                                <use href="#i-alerta" /></svg>
+                            <div>
+                                <div class="cartao__titulo">Alertas de triagem</div>
+                                <div class="cartao__sub">regras avaliadas pelo servidor</div>
+                            </div>
+                        </header>
+                        <div class="cartao__corpo" id="alertas"></div>
+                    </article>
+                </div>
+            </section>
+        </main>
+
+        <footer class="rodape">
+            <span><b>MedPulse</b> · triagem em tempo real</span>
+            <span id="rodape-sincronismo">aguardando primeiro snapshot…</span>
+        </footer>
+    </div>
+
+    <script>
+        window.MEDPULSE = {{ {
+            'localToken': local_token,
+            'localNome': local.nome,
+            'hospitais': hospitais_info,
+            'showcaseAtivo': showcase_ativo,
+        } | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='vendor/socket.io.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/chart.umd.min.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
+
 </html>

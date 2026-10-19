@@ -1,0 +1,581 @@
+/* ============================================================
+   MedPulse — folha de estilo do painel de triagem para TV
+   Identidade da marca (logo_with_bg.png):
+   navy #002454/#003C60 · teal #009CA8/#00B4C0/#3FD0DA
+
+   Regras desta folha:
+   1. nada rola: a tela inteira (topo + KPIs + grade + rodapé) cabe no viewport;
+   2. toda cor vem de um token, e o tema claro só reescreve tokens — nenhum
+      componente tem cor própria;
+   3. as cores de prioridade são a escala oficial de triagem e só são usadas
+      para prioridade; as séries do gráfico têm tokens próprios.
+   ============================================================ */
+
+:root {
+    color-scheme: dark;
+
+    /* rampa da marca */
+    --navy-900: #04121f;
+    --navy-850: #06192c;
+    --navy-800: #0a2340;
+    --navy-700: #002454;
+    --navy-600: #003c60;
+    --teal-700: #009ca8;
+    --teal-600: #00a8b4;
+    --teal-500: #00b4c0;
+    --teal-400: #3fd0da;
+    --mint: #00c0b4;
+
+    /* a cor de destaque (ícones, focos, links) acompanha o tema */
+    --acento: var(--teal-400);
+
+    /* fundo da página: pintado em #painel, não em <body>, para sobreviver ao fullscreen */
+    --fundo: #04121f;
+    --fundo-pintura:
+        radial-gradient(1200px 620px at 12% -8%, rgba(0, 168, 180, .22), transparent 60%),
+        radial-gradient(900px 520px at 92% 4%, rgba(0, 60, 96, .55), transparent 62%),
+        linear-gradient(180deg, var(--navy-900), var(--navy-850) 45%, #051525 100%);
+    --textura: rgba(255, 255, 255, .017);
+
+    /* superfícies */
+    --cartao-fundo: linear-gradient(160deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .025));
+    --cartao: #06192c;          /* superfície sólida: tooltips, dropdowns */
+    --topo: linear-gradient(180deg, rgba(4, 18, 31, .97), rgba(4, 18, 31, .9));
+    --surface: rgba(255, 255, 255, .05);
+    --surface-2: rgba(255, 255, 255, .085);
+    --varrido: rgba(255, 255, 255, .12);
+    --linha: rgba(180, 226, 235, .14);
+    --borda: rgba(0, 180, 192, .20);
+    --borda-forte: rgba(0, 180, 192, .45);
+
+    /* texto */
+    --texto: #eaf6f9;
+    --texto-2: #a8c4d2;
+    --texto-3: #7495a9;
+
+    /* estados operacionais (distintas das cores de prioridade) */
+    --ok: #22c55e;
+    --info: #38bdf8;
+    --alerta: #facc15;
+    --perigo: #fb5b6c;
+
+    /* escala oficial de triagem: Alta=vermelho, Intermediária=amarelo,
+       Baixa=verde, Não urgente=azul, Sem triagem=branco no tema escuro.
+       --p-*-fg é o texto legível sobre o preenchimento sólido. */
+    --p-alta: #f2384f;
+    --p-alta-fg: #ffffff;
+    --p-intermediaria: #f7c531;
+    --p-intermediaria-fg: #2b1e00;
+    --p-baixa: #1f9d55;
+    --p-baixa-fg: #ffffff;
+    --p-nao_urgente: #3b74f0;
+    --p-nao_urgente-fg: #ffffff;
+    --p-sem_triagem: #f3f8fb;
+    --p-sem_triagem-fg: #0a1a28;
+    --ponto-aro: rgba(255, 255, 255, .28);
+
+    /* séries do gráfico de fluxo: não coincidem com nenhuma cor de prioridade */
+    --serie-chegada: var(--teal-500);
+    --serie-conclusao: #8b5cf6;
+    --serie-fila: var(--texto);
+
+    /* fila de espera */
+    --fila: var(--teal-500);
+    --atend: #8fa9c0;
+
+    --raio: 16px;
+    --raio-sm: 11px;
+    --sombra: 0 18px 40px -24px rgba(0, 0, 0, .85);
+    --transicao: 180ms cubic-bezier(.4, 0, .2, 1);
+
+    /* ritmo vertical: tudo se reparte entre topo, KPIs, grade e rodapé */
+    --folga: clamp(10px, 1.2vh, 22px);
+    --gap: clamp(10px, 1.1vh, 20px);
+}
+
+/* ---------- tema claro ---------- */
+:root[data-tema="claro"] {
+    color-scheme: light;
+
+    --acento: var(--teal-700);
+
+    --fundo: #eef5f8;
+    --fundo-pintura:
+        radial-gradient(1100px 600px at 10% -10%, rgba(0, 156, 168, .18), transparent 62%),
+        radial-gradient(900px 520px at 95% 2%, rgba(0, 60, 96, .12), transparent 60%),
+        linear-gradient(180deg, #f4f9fb, #e9f2f6 55%, #e2edf2 100%);
+    --textura: rgba(0, 45, 75, .035);
+
+    --cartao-fundo: linear-gradient(160deg, #ffffff, #f7fbfd);
+    --cartao: #ffffff;
+    --topo: linear-gradient(180deg, #ffffff, #f2f8fa);
+    --surface: rgba(4, 45, 80, .05);
+    --surface-2: rgba(4, 45, 80, .09);
+    --varrido: rgba(4, 45, 80, .10);
+    --linha: rgba(0, 60, 96, .16);
+    --borda: rgba(0, 124, 150, .30);
+    --borda-forte: rgba(0, 124, 150, .55);
+
+    --texto: #0b2338;
+    --texto-2: #3f5f76;
+    --texto-3: #64808f;
+
+    --ok: #0f9d58;
+    --info: #0d7bb8;
+    --alerta: #b8860b;
+    --perigo: #cf2233;
+
+    /* Sem triagem = preto no tema claro */
+    --p-alta: #d1132f;
+    --p-alta-fg: #ffffff;
+    --p-intermediaria: #eab308;
+    --p-intermediaria-fg: #241a00;
+    --p-baixa: #16803d;
+    --p-baixa-fg: #ffffff;
+    --p-nao_urgente: #1257c9;
+    --p-nao_urgente-fg: #ffffff;
+    --p-sem_triagem: #101317;
+    --p-sem_triagem-fg: #ffffff;
+    --ponto-aro: rgba(0, 45, 75, .22);
+
+    --serie-conclusao: #7c3aed;
+    --atend: #6b8798;
+
+    --sombra: 0 16px 34px -26px rgba(4, 45, 80, .5);
+}
+
+/* ---------- base ---------- */
+/* Escala tipográfica do painel: a mesma folha serve de 1280px a 4K, e o texto
+   cresce com a tela porque um painel de TV é lido de longe. */
+:root { font-size: clamp(13px, .55vw + 6px, 26px); }
+
+* { box-sizing: border-box; }
+
+html, body {
+    height: 100%;
+    overflow: hidden;          /* nenhum scroll de página em tela cheia ou Full HD */
+}
+
+body {
+    margin: 0;
+    font-family: "Inter", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    color: var(--texto);
+    background: var(--fundo);
+    -webkit-font-smoothing: antialiased;
+    font-variant-numeric: tabular-nums;
+}
+
+a { color: var(--acento); }
+button { font: inherit; }
+.ico { flex: none; }
+
+#painel {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: var(--texto);
+    /* cor e imagem separadas: no atalho `background` a cor só pode vir na última
+       camada, e a declaração inteira seria descartada — o painel ficaria sem fundo */
+    background-color: var(--fundo);
+    background-image: var(--fundo-pintura);
+}
+
+#painel::before {
+    /* textura sutil de grade clínica */
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(var(--textura) 1px, transparent 1px),
+        linear-gradient(90deg, var(--textura) 1px, transparent 1px);
+    background-size: 46px 46px;
+    z-index: 0;
+}
+
+/* apenas as três faixas de layout participam da coluna; painéis suspensos são
+   filhos diretos de #painel quando estamos em tela cheia e precisam ficar fixos */
+.topo, .conteudo, .rodape { position: relative; z-index: 1; }
+
+/* ---------- fullscreen (modo parede) ----------
+   O fundo mora em #painel, então o elemento em tela cheia nunca fica
+   transparente sobre o "backdrop" preto do navegador. */
+#painel:fullscreen,
+#painel:-webkit-full-screen {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: var(--fundo);
+    background-image: var(--fundo-pintura);
+}
+
+#painel:fullscreen .multiselect__painel,
+#painel:-webkit-full-screen .multiselect__painel { z-index: 200; }
+
+/* ---------- topo ---------- */
+.topo {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: clamp(10px, 1.4vw, 26px);
+    padding: clamp(8px, 1vh, 16px) clamp(14px, 2vw, 34px);
+    background: var(--topo);
+    border-bottom: 1px solid var(--borda);
+    /* sem backdrop-filter: o desfoque criava contexto de empilhamento que
+       prendia o dropdown suspenso (o Firefox não pintava o excesso) */
+}
+
+.topo__marca { display: flex; align-items: center; gap: clamp(9px, .9vw, 18px); min-width: 0; flex: 1 1 auto; }
+.topo__logo { width: 2.9rem; height: 2.9rem; border-radius: 14px; object-fit: cover; box-shadow: 0 8px 22px -12px rgba(0, 180, 192, .9); }
+.topo__titulo { display: flex; flex-direction: column; line-height: 1.2; min-width: 0; }
+.topo__titulo strong { font-size: 1.28rem; font-weight: 800; letter-spacing: .2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topo__titulo span { font-size: .8rem; color: var(--texto-2); white-space: nowrap; }
+
+.topo__acoes { display: flex; align-items: center; gap: clamp(7px, .7vw, 14px); flex: 0 0 auto; }
+.topo__grupo { display: flex; align-items: center; gap: clamp(7px, .7vw, 14px); }
+
+.relogio { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.05; margin-right: .3rem; }
+.relogio b { font-size: 1.7rem; font-weight: 800; letter-spacing: .5px; }
+.relogio span { font-size: .76rem; color: var(--texto-3); text-transform: capitalize; }
+
+/* ---------- selo de conexão: dois estados, a verdade do socket ---------- */
+.conexao {
+    display: inline-flex; align-items: center; gap: .5em;
+    padding: .45em .95em; border-radius: 999px; font-size: .85rem; font-weight: 700;
+    background: rgba(34, 197, 94, .13); color: #86efac; border: 1px solid rgba(34, 197, 94, .38);
+    transition: var(--transicao); white-space: nowrap;
+}
+.conexao__ponto { width: .6em; height: .6em; border-radius: 50%; background: currentColor; animation: pulso 2.4s infinite; }
+.conexao[data-estado="offline"] { background: rgba(207, 34, 51, .14); color: var(--perigo); border-color: rgba(251, 91, 108, .45); }
+.conexao[data-estado="offline"] .conexao__ponto { animation: none; }
+
+@keyframes pulso {
+    0% { box-shadow: 0 0 0 0 rgba(134, 239, 172, .55); }
+    70% { box-shadow: 0 0 0 9px rgba(134, 239, 172, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(134, 239, 172, 0); }
+}
+
+.selo-demo {
+    padding: .35em .7em; border-radius: 999px; font-size: .72rem; font-weight: 800; letter-spacing: .4px;
+    color: #04202b; background: linear-gradient(135deg, var(--teal-400), var(--mint));
+}
+
+/* ---------- seletor de hospitais ---------- */
+.multiselect { position: relative; min-width: 12rem; }
+.multiselect__gatilho {
+    width: 100%; display: flex; align-items: center; gap: .6rem; cursor: pointer;
+    padding: .6rem .8rem; color: var(--texto); text-align: left;
+    background: var(--surface); border: 1px solid var(--borda); border-radius: var(--raio-sm);
+    transition: var(--transicao);
+}
+.multiselect__gatilho:hover { border-color: var(--borda-forte); background: var(--surface-2); }
+.multiselect__gatilho[aria-expanded="true"] { border-color: var(--teal-500); box-shadow: 0 0 0 3px rgba(0, 180, 192, .16); }
+.multiselect__gatilho > span:nth-child(2) { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.multiselect__rotulo { font-size: .72rem; color: var(--texto-3); display: block; }
+.multiselect__valor { font-size: .95rem; font-weight: 700; }
+.multiselect__nome { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.multiselect__seta { margin-left: auto; color: var(--acento); transition: transform var(--transicao); }
+.multiselect__gatilho[aria-expanded="true"] .multiselect__seta { transform: rotate(180deg); }
+
+/* Painel fixo no viewport: ele vive em <body> (ou no elemento em tela cheia),
+   fora do cabeçalho, para nenhum pai recortá-lo ou esconder seu excesso. */
+.multiselect__painel {
+    position: fixed; top: 0; left: 0; z-index: 120;
+    display: flex; flex-direction: column; gap: .5rem;
+    padding: .7rem; border-radius: 14px;
+    background: var(--cartao); color: var(--texto);
+    border: 1px solid var(--borda-forte); box-shadow: var(--sombra);
+    animation: aparecer 140ms ease-out;
+}
+.multiselect__painel[hidden] { display: none; }
+.multiselect__lista { overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+.multiselect__opcao {
+    display: flex; align-items: center; gap: .6rem; padding: .55rem .6rem; border-radius: 9px;
+    cursor: pointer; font-size: .95rem; transition: background var(--transicao);
+}
+.multiselect__opcao:hover { background: var(--surface-2); }
+.multiselect__opcao input { accent-color: var(--teal-500); width: 1.05rem; height: 1.05rem; }
+.multiselect__rodape { display: flex; gap: .5rem; padding-top: .55rem; border-top: 1px solid var(--linha); }
+.marca-demo { font-size: .68rem; font-weight: 800; padding: .15em .5em; border-radius: 5px; background: rgba(0, 180, 192, .2); color: var(--acento); }
+
+@keyframes aparecer { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+/* ---------- botões ---------- */
+.botao {
+    display: inline-flex; align-items: center; gap: .45em; cursor: pointer;
+    padding: .55em .9em; font-size: .88rem; font-weight: 700; color: var(--texto);
+    background: var(--surface); border: 1px solid var(--borda); border-radius: var(--raio-sm);
+    transition: var(--transicao);
+}
+.botao:hover { background: var(--surface-2); border-color: var(--borda-forte); }
+.botao--primario { background: linear-gradient(135deg, var(--teal-600), var(--navy-600)); border-color: transparent; color: #eafffd; }
+.botao--icone { padding: .55em .7em; }
+.botao--mini { padding: .4em .7em; font-size: .78rem; }
+
+/* ---------- área útil: altura restante repartida, sem rolagem ---------- */
+.conteudo {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--folga);
+    padding: var(--folga) clamp(14px, 2vw, 34px);
+    overflow: hidden;
+}
+
+.faixa-kpis { flex: 0 0 auto; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--gap); }
+
+.grade {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    gap: var(--gap);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: minmax(0, 1fr);
+}
+.coluna { display: grid; grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: var(--gap); min-height: 0; }
+.coluna--centro { grid-template-rows: minmax(0, 1.3fr) minmax(0, 1fr); }
+
+/* ---------- cartões ---------- */
+.cartao {
+    background: var(--cartao-fundo);
+    border: 1px solid var(--linha);
+    border-radius: var(--raio);
+    box-shadow: var(--sombra);
+    overflow: hidden;
+}
+.cartao--crescer { display: flex; flex-direction: column; min-height: 0; }
+.cartao__cabecalho {
+    flex: 0 0 auto; display: flex; align-items: center; gap: .6rem;
+    padding: clamp(7px, 1vh, 14px) clamp(10px, 1vw, 18px) clamp(5px, .8vh, 10px);
+    border-bottom: 1px solid var(--linha);
+}
+.cartao__titulo { font-size: 1rem; font-weight: 800; letter-spacing: .2px; }
+.cartao__sub { font-size: .76rem; color: var(--texto-3); }
+.cartao__corpo {
+    flex: 1 1 auto; min-height: 0;
+    display: flex; flex-direction: column; justify-content: flex-start;
+    gap: clamp(1px, .35vh, 6px);
+    padding: clamp(6px, 1vh, 14px) clamp(10px, 1vw, 18px) clamp(8px, 1.1vh, 16px);
+    overflow: hidden;
+}
+.cartao__corpo--grafico { padding-block: clamp(6px, 1vh, 12px) clamp(8px, 1.1vh, 14px); }
+.cartao__rodape { padding: .6rem clamp(10px, 1vw, 18px); border-top: 1px solid var(--linha); background: var(--surface); }
+
+/* Poucas linhas não esticam a cartão: o espaço que sobra vira respiro distribuído. */
+.matriz__linha:not(.matriz__linha--cabecalho),
+.unidade:not(.unidade--cabecalho),
+.atendido,
+.espera__linha { max-height: 3.6rem; }
+
+/* ---------- KPIs ---------- */
+.kpi { position: relative; display: flex; flex-direction: column; gap: .3rem; padding: clamp(8px, 1.1vh, 16px) clamp(9px, 1vw, 16px); overflow: hidden; }
+.kpi::after {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: linear-gradient(180deg, var(--teal-500), var(--navy-600));
+}
+.kpi--ok::after { background: linear-gradient(180deg, var(--ok), #0f7a3c); }
+.kpi--alerta::after { background: linear-gradient(180deg, var(--alerta), #a16207); }
+.kpi--perigo::after { background: linear-gradient(180deg, var(--perigo), #9f1239); }
+.kpi__rotulo { font-size: .76rem; text-transform: uppercase; letter-spacing: .6px; color: var(--texto-3); font-weight: 700; }
+.kpi__valor { font-size: clamp(1.5rem, 2.1vw, 2.3rem); font-weight: 800; line-height: 1; }
+.kpi__unidade { font-size: .82rem; font-weight: 700; color: var(--texto-2); margin-left: 3px; }
+.kpi__rodape { display: flex; align-items: center; gap: .4em; font-size: .76rem; color: var(--texto-3); }
+.kpi__delta { font-weight: 800; padding: .1em .45em; border-radius: 6px; }
+.kpi__delta--sobe { color: var(--ok); background: rgba(34, 197, 94, .14); }
+.kpi__delta--desce { color: var(--perigo); background: rgba(251, 91, 108, .14); }
+.kpi__spark { position: absolute; right: .7rem; bottom: .7rem; opacity: .5; }
+
+/* ---------- matriz de fila por prioridade ---------- */
+.matriz__linha {
+    flex: 1 1 auto; min-height: 0;
+    display: grid; align-items: center; gap: clamp(6px, .8vw, 16px);
+    grid-template-columns: minmax(0, 1.7fr) repeat(3, minmax(0, .66fr)) minmax(0, .86fr);
+    padding: 0 .2rem; border-bottom: 1px dashed var(--linha); font-size: .95rem;
+}
+.matriz__linha:last-child { border-bottom: 0; }
+/* linha sem fila alguma continua legível: apenas os números recuam, nunca a cor da
+   prioridade — um ponto esmaecido deixaria de ser a cor oficial do protocolo */
+.matriz__linha--cabecalho {
+    flex: 0 0 auto; color: var(--texto-3); font-size: .72rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .6px; border-bottom: 1px solid var(--linha);
+}
+.matriz__linha--cabecalho span:not(:first-child) { text-align: right; }
+.matriz__linha[data-aberto="false"] .matriz__num,
+.matriz__linha[data-aberto="false"] .matriz__tempo { color: var(--texto-3); font-weight: 600; }
+.matriz__prioridade { display: flex; align-items: center; gap: .55em; min-width: 0; }
+.matriz__prioridade b { font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.matriz__num { text-align: right; font-weight: 800; font-size: 1.3rem; }
+.matriz__num--zero { color: var(--texto-3); font-weight: 600; }
+.matriz__tempo { text-align: right; color: var(--texto-2); font-size: .9rem; }
+
+.ponto-prioridade {
+    width: clamp(12px, .85vw, 20px); height: clamp(12px, .85vw, 20px); flex: none;
+    border-radius: 50%; background: var(--cor, var(--p-sem_triagem));
+    box-shadow: 0 0 0 1px var(--ponto-aro), 0 0 14px -3px var(--cor, var(--p-sem_triagem));
+}
+
+/* ---------- comparativo por unidade ---------- */
+.unidade {
+    flex: 1 1 auto; min-height: 0;
+    display: grid; align-items: center; gap: clamp(6px, .8vw, 14px);
+    grid-template-columns: minmax(0, 1fr) repeat(3, minmax(0, 3.2rem));
+    padding: 0 .2rem; border-bottom: 1px dashed var(--linha); font-size: .92rem;
+}
+.unidade:last-child { border-bottom: 0; }
+.unidade--cabecalho {
+    flex: 0 0 auto; color: var(--texto-3); font-size: .72rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .6px; border-bottom: 1px solid var(--linha);
+}
+.unidade--cabecalho span:not(:first-child) { text-align: right; }
+.unidade__nome { display: flex; align-items: center; gap: .5rem; min-width: 0; }
+.unidade__nome b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+.unidade__num { text-align: right; font-weight: 800; font-size: 1.15rem; }
+.unidade__num--ok { color: var(--ok); }
+
+/* ---------- distribuição do tempo de espera ---------- */
+.espera__cabecalho,
+.espera__linha {
+    display: grid; align-items: center; gap: clamp(6px, .8vw, 14px);
+    grid-template-columns: minmax(0, .95fr) minmax(0, 2fr) minmax(0, 2.6rem);
+    padding: 0 .2rem;
+}
+.espera__cabecalho { flex: 0 0 auto; color: var(--texto-3); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; padding-bottom: .35rem; border-bottom: 1px solid var(--linha); }
+.espera__cabecalho span:last-child { text-align: right; }
+.espera__linha { flex: 1 1 auto; min-height: 0; border-bottom: 1px dashed var(--linha); }
+.espera__linha:last-child { border-bottom: 0; }
+.espera__faixa { font-size: .9rem; font-weight: 700; color: var(--texto-2); white-space: nowrap; }
+.espera__barra { display: flex; align-items: center; height: clamp(14px, 1.9vh, 30px); border-radius: 999px; background: var(--surface); overflow: hidden; }
+.espera__trecho { height: 100%; transition: width 600ms cubic-bezier(.4, 0, .2, 1); }
+.espera__trecho--fila { background: linear-gradient(90deg, var(--teal-600), var(--fila)); border-radius: 999px 0 0 999px; }
+.espera__trecho--atend { background: var(--atend); border-radius: 0 999px 999px 0; }
+.espera__num { text-align: right; font-weight: 800; font-size: 1.15rem; }
+
+/* ---------- atendidos por prioridade ---------- */
+.atendido {
+    flex: 1 1 auto; min-height: 0;
+    display: grid; align-items: center; gap: clamp(6px, .8vw, 14px);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 3.4rem) minmax(0, 3rem);
+    padding: 0 .2rem; border-bottom: 1px dashed var(--linha);
+}
+.atendido:last-child,
+.atendido:nth-last-child(2) { border-bottom: 0; }
+.atendido__marca {
+    justify-self: start; padding: .3em .8em; border-radius: 999px;
+    background: var(--cor, var(--p-sem_triagem)); color: var(--fg, var(--p-sem_triagem-fg));
+    font-size: .84rem; font-weight: 800; white-space: nowrap;
+    box-shadow: 0 0 0 1px var(--ponto-aro);
+}
+.atendido__num { text-align: right; font-weight: 800; font-size: 1.45rem; }
+.atendido__pct { text-align: right; font-size: .85rem; color: var(--texto-3); font-weight: 700; }
+
+.fila-status__total {
+    flex: 0 0 auto; display: flex; justify-content: space-between; align-items: baseline; gap: .6rem;
+    margin-top: .5rem; padding-top: .5rem; border-top: 1px solid var(--borda);
+    font-size: .85rem; color: var(--texto-2);
+}
+.fila-status__total b { font-size: 1.2rem; color: var(--texto); }
+
+/* ---------- gráficos ---------- */
+.grafico { position: relative; flex: 1 1 auto; min-height: 0; width: 100%; }
+/* o canvas é redimensionado pelo Chart.js; o teto evita que um quadro intermediário
+   estoure o cartão quando a faixa de falha entra em cena e rouba altura */
+.grafico canvas { max-width: 100%; max-height: 100%; }
+
+/* ---------- alertas ---------- */
+#alertas { justify-content: flex-start; gap: clamp(6px, .9vh, 14px); }
+.alerta-item {
+    flex: 0 0 auto; display: flex; gap: .7rem; padding: .65rem .8rem; border-radius: 12px;
+    font-size: .9rem; border: 1px solid var(--linha); background: var(--surface);
+    animation: aparecer 240ms ease-out;
+}
+.alerta-item__icone { flex: 0 0 auto; width: 1.7rem; height: 1.7rem; border-radius: 8px; display: grid; place-items: center; }
+.alerta-item--critico { border-color: rgba(251, 91, 108, .45); background: rgba(251, 91, 108, .10); }
+.alerta-item--critico .alerta-item__icone { background: rgba(251, 91, 108, .2); color: var(--perigo); }
+.alerta-item--alto { border-color: rgba(234, 179, 8, .45); background: rgba(234, 179, 8, .10); }
+.alerta-item--alto .alerta-item__icone { background: rgba(234, 179, 8, .2); color: var(--alerta); }
+.alerta-item--medio { border-color: var(--borda); background: var(--surface-2); }
+.alerta-item--medio .alerta-item__icone { background: rgba(0, 180, 192, .18); color: var(--acento); }
+.alerta-item strong { display: block; margin-bottom: 2px; }
+.alerta-item p { margin: 0; color: var(--texto-2); font-size: .82rem; }
+.alertas__vazio,
+.vazio,
+.erro-estado {
+    flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: .5rem; padding: .8rem; text-align: center; color: var(--texto-3); font-size: .9rem;
+}
+.erro-estado { color: var(--perigo); }
+
+/* ---------- estados de carregando ---------- */
+.esqueleto { position: relative; overflow: hidden; background: var(--surface-2); border-radius: 8px; height: 1.1rem; }
+.esqueleto::after {
+    content: ""; position: absolute; inset: 0; transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, var(--varrido), transparent);
+    animation: varrer 1.35s infinite;
+}
+@keyframes varrer { 100% { transform: translateX(100%); } }
+.esqueleto-linha { display: flex; gap: .7rem; align-items: center; padding: .55rem .2rem; border-bottom: 1px dashed var(--linha); }
+.esqueleto-linha .esqueleto:nth-child(1) { width: 1.6rem; height: 1.6rem; border-radius: 50%; flex: none; }
+.esqueleto-linha .esqueleto:nth-child(2) { flex: 1; }
+.esqueleto-linha .esqueleto:nth-child(3) { width: 4rem; flex: none; }
+
+/* ---------- faixa de falha ---------- */
+.faixa-status {
+    flex: 0 0 auto; display: flex; align-items: center; gap: .6rem;
+    padding: .55rem .9rem; border-radius: 12px; font-size: .85rem;
+    border: 1px solid rgba(250, 204, 21, .4); background: rgba(250, 204, 21, .12); color: var(--alerta);
+}
+.faixa-status--erro { border-color: rgba(251, 91, 108, .45); background: rgba(251, 91, 108, .12); color: var(--perigo); }
+.faixa-status[hidden] { display: none; }
+
+/* ---------- rodapé ---------- */
+.rodape {
+    flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: .4rem clamp(14px, 2vw, 34px) .6rem; color: var(--texto-3); font-size: .78rem;
+    border-top: 1px solid var(--linha);
+}
+.rodape b { color: var(--texto-2); font-weight: 700; }
+
+/* ---------- telas menores que Full HD ---------- */
+@media (max-width: 1500px) {
+    .kpi__rodape, .kpi__spark { display: none; }   /* a linha de KPIs nunca pode virar duas */
+}
+@media (max-width: 1200px) {
+    .relogio span { display: none; }
+    .botao__texto { display: none; }
+}
+
+/* Abaixo de 1000px a grade fixa de TV não cabe: devolve-se a rolagem da área
+   útil, sem jamais afetar Full HD e resoluções maiores. */
+@media (max-width: 1000px) {
+    :root { font-size: 14px; }
+    html, body { overflow: auto; }
+    #painel { height: auto; min-height: 100%; }
+    .conteudo { overflow: visible; }
+    .faixa-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grade { grid-template-columns: 1fr; grid-template-rows: none; }
+    .coluna, .coluna--centro { grid-template-rows: none; }
+    .cartao--crescer { min-height: 240px; }
+    .topo { flex-wrap: wrap; }
+    .multiselect { flex: 1 1 100%; }
+}
+
+/* ---------- página de erro do servidor (fora do painel) ---------- */
+.pagina-erro {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px; text-align: center; padding: 40px 20px; color: var(--texto-2);
+}
+.pagina-erro h1 { font-size: 1.5rem; color: var(--texto); margin: 8px 0 0; }
+.pagina-erro p { max-width: 520px; margin: 0; line-height: 1.6; }
+
+/* ---------- acessibilidade / movimento ---------- */
+:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; border-radius: 6px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}

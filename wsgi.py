@@ -1,3 +1,7 @@
-from app import socket, app
+"""Ponto de entrada WSGI para produção: `gunicorn wsgi:app`.
 
-if __name__ == "__main__": socket.socket.run(app)
+O `app.py` é o runner local (sobe o servidor de desenvolvimento com Socket.IO).
+Aqui apenas expomos a aplicação para um servidor WSGI real.
+"""
+
+from app import app
