@@ -1,0 +1,7 @@
+-r requirements.txt
+
+pytest>=8.3,<9
+pytest-timeout>=2.3,<3
+
+# Validação em navegador (opcional; ver CONTRIBUTING.md)
+playwright>=1.64,<2

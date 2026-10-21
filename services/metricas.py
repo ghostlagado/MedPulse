@@ -194,7 +194,7 @@ def _alertas(resumo_base, rows, agora):
     if seletiva:
         alertas.append({
             "nivel": "alto",
-            "titulo": "Pacientes há mais de 4h na fila",
+            "titulo": "Fila acima de 4 h",
             "descricao": f"{len(seletiva)} atendimento(s) sem movimentação além do limite.",
         })
     sem_triagem = sum(1 for a in rows if a.status == STATUS_AGUARDANDO and a.prioridade == "sem_triagem")
